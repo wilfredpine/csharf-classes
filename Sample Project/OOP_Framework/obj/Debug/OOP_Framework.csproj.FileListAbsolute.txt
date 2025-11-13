@@ -1,0 +1,24 @@
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\obj\Debug\OOP_Framework.csproj.AssemblyReference.cache
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\obj\Debug\OOP_Framework.Form1.resources
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\obj\Debug\OOP_Framework.Properties.Resources.resources
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\obj\Debug\OOP_Framework.csproj.GenerateResource.cache
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\obj\Debug\OOP_Framework.csproj.CoreCompileInputs.cache
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\bin\Debug\MyDB.mdf
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\bin\Debug\MyDB_log.ldf
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\bin\Debug\OOP_Framework.exe.config
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\bin\Debug\OOP_Framework.exe
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\bin\Debug\OOP_Framework.pdb
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\obj\Debug\OOP_Framework.exe
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\OOP_Framework\obj\Debug\OOP_Framework.pdb
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\bin\Debug\MyDB.mdf
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\bin\Debug\MyDB_log.ldf
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\bin\Debug\OOP_Framework.exe.config
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\bin\Debug\OOP_Framework.exe
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\bin\Debug\OOP_Framework.pdb
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\obj\Debug\OOP_Framework.csproj.AssemblyReference.cache
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\obj\Debug\OOP_Framework.Form1.resources
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\obj\Debug\OOP_Framework.Properties.Resources.resources
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\obj\Debug\OOP_Framework.csproj.GenerateResource.cache
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\obj\Debug\OOP_Framework.csproj.CoreCompileInputs.cache
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\obj\Debug\OOP_Framework.exe
+C:\Users\WVP\Documents\VS Projects\OOP_Framework\Sample Project\OOP_Framework\obj\Debug\OOP_Framework.pdb
