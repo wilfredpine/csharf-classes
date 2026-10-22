@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete step-by-step documentation for the C# WinForms OOP classes library.">
+  <title>C# WinForms Classes — Complete Guide</title>
+  <style>
+    :root { color-scheme: light; --ink:#17283b; --muted:#52657a; --line:#d8e1ea; --brand:#155e9a; --soft:#f3f7fb; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f7f9fc; color:var(--ink); font:16px/1.55 "Segoe UI",Arial,sans-serif; }
+    header { background:linear-gradient(120deg,#123c63,#1974ae); color:#fff; padding:42px max(22px,calc((100% - 1040px)/2)); }
+    header h1 { margin:0 0 8px; font-size:clamp(2rem,4vw,3rem); line-height:1.1; }
+    header p { margin:0; max-width:760px; color:#e4f2ff; }
+    main { width:min(1040px,calc(100% - 32px)); margin:24px auto 56px; }
+    nav,.card { background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 4px 16px #102d4610; }
+    nav { padding:16px 20px; margin-bottom:18px; }
+    nav strong { display:block; margin-bottom:6px; }
+    nav ul { display:flex; flex-wrap:wrap; gap:8px 18px; margin:0; padding-left:20px; }
+    a { color:var(--brand); }
+    .card { padding:22px clamp(18px,3vw,30px); margin:16px 0; }
+    h2 { margin:0 0 12px; font-size:1.45rem; }
+    h3 { margin:20px 0 8px; font-size:1.08rem; }
+    p { margin:8px 0 12px; }
+    ol,ul { padding-left:24px; }
+    li { margin:5px 0; }
+    code { font-family:Consolas,"Cascadia Code",monospace; font-size:.92em; color:#a12f38; }
+    pre { margin:10px 0 16px; padding:15px; overflow:auto; border-radius:9px; background:#102337; color:#eef6ff; line-height:1.45; }
+    pre code { color:inherit; font-size:.88rem; }
+    .note { padding:12px 14px; border-left:4px solid #2781bc; background:var(--soft); border-radius:4px; }
+    .steps { counter-reset:item; list-style:none; padding:0; }
+    .steps li { counter-increment:item; padding:12px 14px; margin:10px 0; border:1px solid var(--line); border-radius:8px; }
+    .steps li::before { content:counter(item); display:inline-grid; place-items:center; width:26px; height:26px; margin-right:9px; border-radius:50%; background:var(--brand); color:#fff; font-weight:700; }
+    footer { text-align:center; color:var(--muted); padding:0 16px 26px; }
+    @media (max-width:600px) { header { padding:30px 20px; } .card { padding:18px; } pre { margin-left:-4px; margin-right:-4px; } }
+  </style>
+</head>
+<body>
+<header>
+  <h1>C# WinForms Classes</h1>
+  <p>A quick, practical guide to database CRUD, reusable form controls, charts, and printable reports. Works with .NET Framework 4.7.2 and standard or third-party WinForms controls derived from Control.</p>
+</header>
+<main>
+  <nav aria-label="Contents">
+    <strong>In this guide</strong>
+    <ul>
+      <li><a href="#setup">1. Installation/config</a></li>
+      <li><a href="#crud">2. CRUD and DataGridView</a></li>
+      <li><a href="#methods">3. All methods</a></li>
+      <li><a href="#helpers">4. Other helpers</a></li>
+      <li><a href="#implementation">5. Complete implementation</a></li>
+      <li><a href="#more-examples">Additional short examples</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ul>
+  </nav>
+
+  <section class="card" id="setup">
+    <h2>Part 1 — Step 1: Installation and configuration</h2>
+    <ol class="steps">
+      <li>In Visual Studio, create a <strong>Windows Forms App (.NET Framework)</strong> and choose <strong>.NET Framework 4.7.2</strong>.</li>
+      <li>Add a folder named <code>Classes</code>. Copy the files from the archive's root <code>Classes</code> folder into it: <code>AppDb.cs</code>, <code>IDatabase.cs</code>, <code>SqlDatabase.cs</code>, <code>FormControls.cs</code>, <code>Charts.cs</code>, and <code>ReportPrinter.cs</code>.</li>
+      <li>Add framework references if Visual Studio has not added them: <code>System.Configuration</code>, <code>System.Data</code>, <code>System.Drawing</code>, <code>System.Windows.Forms</code>, and <code>System.Windows.Forms.DataVisualization</code>.</li>
+      <li>Create a SQL Server LocalDB database named <code>OOPFrameworkDemo</code>. Run <a href="docs/schema.sql">docs/schema.sql</a> to create the sample tables.</li>
+      <li>Set the <code>AppDB</code> connection string in <code>App.config</code>. The name must be exactly <code>AppDB</code>:</li>
+    </ol>
+<pre><code>&lt;connectionStrings&gt;
+  &lt;add name="AppDB"
+       connectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=OOPFrameworkDemo;Integrated Security=True;Connect Timeout=30" /&gt;
+&lt;/connectionStrings&gt;</code></pre>
+    <p class="note">The sample uses SQL Server LocalDB. For SQL Server Express or a remote SQL Server, replace the server and database names in the connection string. Keep the connection string name <code>AppDB</code>.</p>
+    <h3>Installation checklist</h3>
+    <ol>
+      <li>Open <a href="docs/schema.sql">docs/schema.sql</a> in SQL Server Management Studio or Visual Studio SQL Server Object Explorer and execute it.</li>
+      <li>Confirm the <code>Program</code> and <code>Students</code> tables exist.</li>
+      <li>Open <code>Sample Project/OOP_Framework.sln</code> to see the working CRUD and chart/report examples.</li>
+      <li>Register cleanup once at application startup or form startup.</li>
+    </ol>
+    <p>At application exit, close the shared database connection once:</p>
+<pre><code>Application.ApplicationExit += (_, __) =&gt; AppDb.Dispose();</code></pre>
+  </section>
+
+  <section class="card" id="crud">
+    <h2>Part 2 — Step 2: Save, update, delete, and show records</h2>
+    <p>Use <code>AppDb.Instance</code>. Pass values as an object; database values are parameterized by the helper.</p>
+<pre><code>// Save
+bool saved = AppDb.Instance.Save("Students", new { Id_Number = txtIDNumber.Text, First_Name = txtFirstName.Text, Middle_name = txtMiddleName.Text, Last_Name = txtLastName.Text, Contact_Number = txtContactNumber.Text, Birthday = dtpBirthday.Value, Program_Name = cbProgramName.SelectedItem });
+
+// Update by Id
+bool updated = AppDb.Instance.Update("Students", new { Id = selectedId, First_Name = txtFirstName.Text });
+
+// Delete by Id
+bool deleted = AppDb.Instance.Delete("Students", new { Id = selectedId });
+
+// Bind a table to a grid
+AppDb.Instance.Table("SELECT Id, First_Name, Last_Name FROM Students ORDER BY Id DESC", dgvStudents);</code></pre>
+    <h3>Parameterized SQL for a custom query</h3>
+<pre><code>var rows = AppDb.Instance.TableData(
+    "SELECT Id, First_Name, Last_Name FROM Students WHERE Id_Number = @IdNumber",
+    new { IdNumber = txtIDNumber.Text });
+dgvStudents.DataSource = rows;</code></pre>
+    <p>Use <code>Save</code>, <code>Update</code>, or <code>Delete</code> for common CRUD. Use <code>CUD</code> and <code>TableData</code> when a custom query is needed.</p>
+    <h3>Example usage for different controls</h3>
+<pre><code>// DataGridView
+AppDb.Instance.Table("SELECT * FROM Students", dataGridView1);
+
+// ListView
+AppDb.Instance.Table("SELECT * FROM Students", listView1);
+
+// ComboBox: values from the first query column are added to the list
+AppDb.Instance.list("SELECT Program_Name FROM Program ORDER BY Program_Name", comboBox1);
+
+// TextBox, Label, or another control: read the DataTable and assign a value
+var first = AppDb.Instance.TableData("SELECT TOP 1 First_Name FROM Students ORDER BY Id");
+if (first.Rows.Count &gt; 0) textBox1.Text = Convert.ToString(first.Rows[0]["First_Name"]);</code></pre>
+    <h3>Separate search example using TableData</h3>
+<pre><code>var data = AppDb.Instance.TableData(
+    "SELECT * FROM Students WHERE First_Name LIKE @keyword OR Last_Name LIKE @keyword",
+    new { keyword = "%" + txtSearch.Text.Trim() + "%" });
+
+AppDb.Instance.Table(data, dataGridView1);</code></pre>
+    <h3>Parameterized grid search with custom column headers</h3>
+<pre><code>AppDb.Instance.Table(
+    "SELECT Id, First_Name, Last_Name, Program_Name FROM Students WHERE Program_Name = @program",
+    new { program = comboBox1.Text },
+    dataGridView1,
+    new[] { "ID", "First Name", "Last Name", "Program" });</code></pre>
+  </section>
+
+  <section class="card" id="controls">
+    <h2>Part 2 — Step 3: Control examples</h2>
+    <p>Control helpers accept <code>System.Windows.Forms.Control</code>. Standard controls and vendor controls that expose their input through <code>Text</code> can use the same methods.</p>
+<pre><code>// Clear inputs in a panel, group, or form; labels and buttons stay unchanged
+FormControls.ClearInputs(groupBox1);
+
+// Validate required fields and focus the first empty one
+var missing = FormControls.FirstRequired(txtIDNumber, txtFirstName, txtLastName);
+if (missing != null) { missing.Focus(); MessageBox.Show(missing.Name + " is required."); return; }
+
+// Check one control
+if (!FormControls.Required(gunaTextBoxName, "Name")) return;</code></pre>
+    <p><code>ClearInputs</code> recursively handles text boxes, combo boxes, dates, check boxes, radio buttons, and numeric inputs. For a vendor control that inherits directly from <code>Control</code>, call <code>FormControls.ClearText(vendorInput)</code> when its input value is exposed by <code>Text</code>. Unsupported controls stay unchanged.</p>
+  </section>
+
+  <section class="card" id="charts">
+    <h2>Part 2 — Step 4: Chart example</h2>
+    <ol>
+      <li>Drag a WinForms <code>Chart</code> control from the toolbox onto your form.</li>
+      <li>Load a <code>DataTable</code> with a category column and a numeric value column.</li>
+      <li>Bind a column, line, or pie series:</li>
+    </ol>
+<pre><code>var data = AppDb.Instance.TableData("SELECT Program_Name, COUNT(*) AS StudentCount FROM Students GROUP BY Program_Name");
+Charts.Bind(chart1, data, "Program_Name", "StudentCount", "Students", SeriesChartType.Column);
+
+// Change chart type
+Charts.Bind(chart1, data, "Program_Name", "StudentCount", "Trend", SeriesChartType.Line);</code></pre>
+    <p>The helper replaces the previous series each time. It returns <code>null</code> when the table is null or empty. Add <code>using System.Windows.Forms.DataVisualization.Charting;</code> for <code>SeriesChartType</code>.</p>
+  </section>
+
+  <section class="card" id="reports">
+    <h2>Part 2 — Step 5: Report example</h2>
+    <p>Pass a <code>DataTable</code> to the built-in report printer. Preview opens the Windows print preview; Print opens the printer selection dialog.</p>
+<pre><code>var report = AppDb.Instance.TableData("SELECT Id, Id_Number, First_Name, Last_Name FROM Students ORDER BY Id");
+ReportPrinter.Preview(report, "Student List", "First Semester 2026–2027");
+
+// Send to a selected printer
+ReportPrinter.Print(report, "Student List", "First Semester 2026–2027");</code></pre>
+    <p>Reports include a title, optional subtitle, shaded column headings, alternating rows, repeated headings on each page, margins, and page numbers. Tables with six or more columns print in landscape orientation. Wide columns shrink to fit the printable page.</p>
+  </section>
+
+  <section class="card" id="methods">
+    <h2>Part 3 — Method definitions and examples</h2>
+    <p>The library is synchronous and targets SQL Server. Parameters named <code>parameters</code> accept an anonymous object or <code>IDictionary&lt;string, object&gt;</code>; values become SQL parameters automatically. <code>CommandTimeoutSeconds</code> controls the default timeout, and the optional <code>Logger</code> action receives command text for diagnostics.</p>
+    <h3>AppDb</h3>
+    <table class="grid"><tr><th>Member</th><th>Parameters</th><th>Definition and sample</th></tr>
+      <tr><td><code>AppDb.Instance</code></td><td>None</td><td>Returns the shared <code>IDatabase</code>. Use it from every form: <code>AppDb.Instance.Table(query, dgv);</code></td></tr>
+      <tr><td><code>AppDb.Dispose()</code></td><td>None</td><td>Closes the shared connection. Use <code>Application.ApplicationExit += (_, __) =&gt; AppDb.Dispose();</code></td></tr>
+    </table>
+    <h3>Core SQL and CRUD methods</h3>
+    <table class="grid"><tr><th>Method</th><th>Definition</th><th>Sample</th></tr>
+      <tr><td><code>SqlDatabase(connectionString)</code></td><td>Creates and opens a SQL Server connection.</td><td>Normally created automatically by <code>AppDb.Instance</code>.</td></tr>
+      <tr><td><code>Close()</code> / <code>Dispose()</code></td><td>Closes and releases the current connection.</td><td>Prefer <code>AppDb.Dispose()</code> at application exit.</td></tr>
+      <tr><td><code>CUD(query, parameters)</code></td><td>Executes INSERT, UPDATE, or DELETE and returns affected rows.</td><td><code>AppDb.Instance.CUD("UPDATE Students SET Last_Name=@name WHERE Id=@id", new { name="Pine", id=1 });</code></td></tr>
+      <tr><td><code>Scalar(query, parameters)</code></td><td>Returns the first value from the first result row.</td><td><code>var total = AppDb.Instance.Scalar("SELECT COUNT(*) FROM Students");</code></td></tr>
+      <tr><td><code>TableData(query, parameters)</code></td><td>Returns a <code>DataTable</code>.</td><td><code>var rows = AppDb.Instance.TableData("SELECT * FROM Students WHERE Id=@id", new { id=1 });</code></td></tr>
+      <tr><td><code>select(query)</code></td><td>Returns a <code>SqlDataReader</code>; use <code>TableData</code> for most forms.</td><td><code>using (var reader = AppDb.Instance.select("SELECT Id FROM Students")) { }</code></td></tr>
+      <tr><td><code>Save(table, data)</code></td><td>Inserts object properties as columns and returns <code>bool</code>.</td><td><code>AppDb.Instance.Save("Students", new { First_Name="Ana", Last_Name="Cruz" });</code></td></tr>
+      <tr><td><code>Update(table, data, keyColumn)</code></td><td>Updates object properties except the key; key defaults to <code>Id</code>.</td><td><code>AppDb.Instance.Update("Students", new { Id=1, Last_Name="Cruz" });</code></td></tr>
+      <tr><td><code>Delete(table, data, keyColumn)</code></td><td>Deletes by the key property; key defaults to <code>Id</code>.</td><td><code>AppDb.Instance.Delete("Students", new { Id=1 });</code></td></tr>
+      <tr><td><code>Max/Min(table, column)</code></td><td>Returns the maximum or minimum value.</td><td><code>var highest = AppDb.Instance.Max("Students", "Id");</code></td></tr>
+      <tr><td><code>Count(table, condition)</code></td><td>Returns row count; condition is an application-controlled SQL fragment.</td><td><code>var count = AppDb.Instance.Count("Students");</code></td></tr>
+      <tr><td><code>Exists(table, condition)</code></td><td>Returns true when at least one row matches.</td><td><code>if (AppDb.Instance.Exists("Students", "Id_Number = '1001'")) { }</code></td></tr>
+      <tr><td><code>GetById(table, id, keyColumn)</code></td><td>Returns one <code>DataRow</code> or <code>null</code>.</td><td><code>var row = AppDb.Instance.GetById("Students", 1);</code></td></tr>
+      <tr><td><code>Search(table, columns, keyword)</code></td><td>Searches listed columns using a parameterized <code>LIKE</code>.</td><td><code>var rows = AppDb.Instance.Search("Students", new[] { "First_Name", "Last_Name" }, "Ana");</code></td></tr>
+      <tr><td><code>Sum/Average(table, column, condition)</code></td><td>Returns decimal aggregate; empty results return 0.</td><td><code>var average = AppDb.Instance.Average("Scores", "Points");</code></td></tr>
+      <tr><td><code>GetTop(table, top, orderBy)</code></td><td>Returns the first rows using a controlled order expression.</td><td><code>var latest = AppDb.Instance.GetTop("Students", 10, "Id DESC");</code></td></tr>
+    </table>
+    <h3>Paging, schema, stored procedures, and transactions</h3>
+    <table class="grid"><tr><th>Method</th><th>Parameters</th><th>Definition and sample</th></tr>
+      <tr><td><code>Paginate(table, pageNumber, pageSize, orderBy)</code></td><td>1-based page, page size, controlled order</td><td><code>var page = AppDb.Instance.Paginate("Students", 2, 20);</code></td></tr>
+      <tr><td><code>PaginateWithCount(...)</code></td><td>Page, size, optional where/order</td><td><code>var result = AppDb.Instance.PaginateWithCount("Students", 1, 20);</code></td></tr>
+      <tr><td><code>GetDistinct(table, column)</code></td><td>Table and column</td><td><code>var programs = AppDb.Instance.GetDistinct("Students", "Program_Name");</code></td></tr>
+      <tr><td><code>Join(table1, table2, onCondition, columns, where)</code></td><td>Tables and controlled SQL fragments</td><td><code>var rows = AppDb.Instance.Join("Students", "Program", "Students.Program_Name = Program.Program_Name");</code></td></tr>
+      <tr><td><code>ExecStoredProcedure(procName, parameters, timeoutSeconds)</code></td><td>Name, values, optional timeout</td><td><code>AppDb.Instance.ExecStoredProcedure("dbo.SaveStudent", new { Id=1 });</code></td></tr>
+      <tr><td><code>QueryStoredProcedure(procName, parameters, timeoutSeconds)</code></td><td>Name, values, optional timeout</td><td><code>var rows = AppDb.Instance.QueryStoredProcedure("dbo.GetStudents");</code></td></tr>
+      <tr><td><code>ExecuteTransaction(commands)</code></td><td>Query/parameter tuples</td><td><code>AppDb.Instance.ExecuteTransaction(("DELETE FROM A WHERE Id=@id", new { id=1 }), ("DELETE FROM B WHERE Id=@id", new { id=1 }));</code></td></tr>
+      <tr><td><code>ExecuteTransaction(work)</code></td><td><code>Func&lt;SqlTransaction,bool&gt;</code></td><td>Runs custom work and commits only when it returns true.</td></tr>
+      <tr><td><code>ExecuteWithRetry(operation, maxRetries, delayMs)</code></td><td>Function, retry count, initial delay</td><td><code>var value = AppDb.Instance.ExecuteWithRetry(() =&gt; AppDb.Instance.Ping());</code></td></tr>
+      <tr><td><code>GetSchemaTables/Columns</code></td><td>Optional table for columns</td><td>Returns SQL Server metadata tables.</td></tr>
+      <tr><td><code>ColumnExists(table, column)</code></td><td>Table and column</td><td><code>if (AppDb.Instance.ColumnExists("Students", "Birthday")) { }</code></td></tr>
+      <tr><td><code>Ping()</code></td><td>None</td><td><code>if (!AppDb.Instance.Ping()) MessageBox.Show("Database unavailable");</code></td></tr>
+      <tr><td><code>Backup(filePath)</code></td><td>SQL Server-accessible path</td><td>Attempts a database backup and returns <code>bool</code>.</td></tr>
+      <tr><td><code>BulkInsert(table, data)</code></td><td>Table and matching <code>DataTable</code></td><td>Uses <code>SqlBulkCopy</code> and returns <code>bool</code>.</td></tr>
+      <tr><td><code>ClearTable(table)</code></td><td>Controlled table name</td><td>Deletes every row and returns <code>bool</code>.</td></tr>
+    </table>
+    <h3>Upsert, audit, POCO, and WinForms methods</h3>
+    <table class="grid"><tr><th>Method</th><th>Definition and parameters</th><th>Sample</th></tr>
+      <tr><td><code>Upsert(table, keyColumn, data)</code></td><td>Updates by key or inserts when missing.</td><td><code>AppDb.Instance.Upsert("Students", "Id", new { Id=1, Last_Name="Cruz" });</code></td></tr>
+      <tr><td><code>SoftDelete/Restore(table, id, keyColumn, deletedColumn)</code></td><td>Sets the controlled flag column to 1 or 0.</td><td><code>AppDb.Instance.SoftDelete("Students", 1, "Id", "IsDeleted");</code></td></tr>
+      <tr><td><code>Touch(table, id, keyColumn, column)</code></td><td>Sets a timestamp column to <code>SYSDATETIME()</code>.</td><td><code>AppDb.Instance.Touch("Students", 1);</code></td></tr>
+      <tr><td><code>QuerySingle&lt;T&gt; / QueryList&lt;T&gt;</code></td><td>Maps result columns to matching POCO properties.</td><td><code>var student = AppDb.Instance.QuerySingle&lt;StudentRow&gt;("SELECT * FROM Students WHERE Id=@id", new { id=1 });</code></td></tr>
+      <tr><td><code>Table(DataTable, DataGridView, header)</code></td><td>Binds existing data and applies grid settings.</td><td><code>AppDb.Instance.Table(data, dgvStudents);</code></td></tr>
+      <tr><td><code>Table(query, DataGridView, header)</code></td><td>Queries and binds a grid.</td><td><code>AppDb.Instance.Table("SELECT * FROM Students", dgvStudents);</code></td></tr>
+      <tr><td><code>Table(query, parameters, DataGridView, header)</code></td><td>Parameterized query and grid binding.</td><td><code>AppDb.Instance.Table("SELECT * FROM Students WHERE Id=@id", new { id=1 }, dgvStudents);</code></td></tr>
+      <tr><td><code>Table(query, ListView, headers)</code></td><td>Loads query rows into a details ListView.</td><td><code>AppDb.Instance.Table("SELECT * FROM Students", lvStudents);</code></td></tr>
+      <tr><td><code>list(query, ComboBox)</code></td><td>Clears and fills a DropDownList using the first result column.</td><td><code>AppDb.Instance.list("SELECT Program_Name FROM Program", cbProgramName);</code></td></tr>
+    </table>
+  </section>
+
+  <section class="card" id="helpers">
+    <h2>Part 4 — Other helpers and features</h2>
+    <h3>Reusable control helpers</h3>
+<pre><code>FormControls.ClearInputs(groupBox1);
+FormControls.ClearText(gunaTextBoxName); // explicit vendor Control.Text input
+var missing = FormControls.FirstRequired(txtIDNumber, txtFirstName, txtLastName);
+if (missing != null) { missing.Focus(); return; }
+if (!FormControls.Required(txtFirstName, "First name")) return;</code></pre>
+    <p><code>ClearInputs</code> recursively handles TextBox, ComboBox, DateTimePicker, CheckBox, RadioButton, and NumericUpDown. Labels, buttons, containers, and unsupported custom controls remain unchanged. Use <code>ClearText</code> when a vendor control inherits directly from <code>Control</code> and stores its input in <code>Text</code>.</p>
+    <h3>Charts</h3>
+<pre><code>using System.Windows.Forms.DataVisualization.Charting;
+Charts.Bind(chart1, data, "Program_Name", "StudentCount", "Students", SeriesChartType.Column);
+Charts.Bind(chart1, data, "Program_Name", "StudentCount", "Trend", SeriesChartType.Line);
+Charts.Bind(chart1, data, "Program_Name", "StudentCount", "Share", SeriesChartType.Pie);</code></pre>
+    <p>The chart helper clears previous series, creates a chart area when needed, skips null rows, and returns <code>null</code> when the table has no usable data.</p>
+    <h3>Reports and printing</h3>
+<pre><code>var report = AppDb.Instance.TableData("SELECT Id, Id_Number, First_Name, Last_Name FROM Students ORDER BY Id");
+ReportPrinter.Preview(report, "Student List", "First Semester 2026–2027");
+ReportPrinter.Print(report, "Student List", "First Semester 2026–2027");</code></pre>
+    <p>The report uses Windows <code>PrintDocument</code> and includes a title, subtitle, colored headings, alternating rows, repeated headings, margins, page numbers, and landscape mode for six or more columns. No external reporting application is required.</p>
+    <h3>POCO mapping</h3>
+<pre><code>public class StudentRow { public int Id { get; set; } public string First_Name { get; set; } public string Last_Name { get; set; } }
+var student = AppDb.Instance.QuerySingle&lt;StudentRow&gt;(
+    "SELECT Id, First_Name, Last_Name FROM Students WHERE Id=@id", new { id = 1 });</code></pre>
+    <div class="best"><strong>Best practices</strong><br>Always use parameterized queries to prevent SQL injection. Dispose database connections on application exit. Use <code>AppDb.Instance</code> for centralized DB access.</div>
+  </section>
+
+  <section class="card" id="implementation">
+    <h2>Part 5 — Complete sample code implementation</h2>
+    <p>This sample keeps event handlers short and uses the helpers for the repeated work.</p>
+    <h3>Load grid and ComboBox</h3>
+<pre><code>private void Form1_Load(object sender, EventArgs e)
+{
+    LoadStudents();
+    AppDb.Instance.list("SELECT Program_Name FROM Program ORDER BY Program_Name", cbProgramName);
+}
+
+private void LoadStudents()
+{
+    AppDb.Instance.Table(
+        "SELECT Id, Id_Number, First_Name, Last_Name, Program_Name FROM Students ORDER BY Id DESC",
+        dgvStudents,
+        new[] { "ID", "ID Number", "First Name", "Last Name", "Program" });
+    if (dgvStudents.Columns.Contains("Id")) dgvStudents.Columns["Id"].Visible = false;
+}</code></pre>
+    <h3>Save or update</h3>
+<pre><code>private void btnSave_Click(object sender, EventArgs e)
+{
+    var missing = FormControls.FirstRequired(txtIDNumber, txtFirstName, txtLastName);
+    if (missing != null) { missing.Focus(); return; }
+    var data = new { Id = _selectedId, Id_Number = txtIDNumber.Text, First_Name = txtFirstName.Text, Last_Name = txtLastName.Text, Contact_Number = txtContactNumber.Text, Birthday = dtpBirthday.Value, Program_Name = cbProgramName.SelectedItem };
+    var ok = _selectedId == 0 ? AppDb.Instance.Save("Students", data) : AppDb.Instance.Update("Students", data);
+    if (ok) { LoadStudents(); FormControls.ClearInputs(groupBox1); _selectedId = 0; }
+}</code></pre>
+    <h3>Search, select, and delete</h3>
+<pre><code>private void txtSearch_TextChanged(object sender, EventArgs e)
+{
+    AppDb.Instance.Table("SELECT * FROM Students WHERE First_Name LIKE @keyword OR Last_Name LIKE @keyword", new { keyword = "%" + txtSearch.Text.Trim() + "%" }, dgvStudents);
+}
+
+private void dgvStudents_CellClick(object sender, DataGridViewCellEventArgs e)
+{
+    if (dgvStudents.CurrentRow == null) return;
+    _selectedId = Convert.ToInt32(dgvStudents.CurrentRow.Cells["Id"].Value);
+}
+
+private void btnDelete_Click(object sender, EventArgs e)
+{
+    if (_selectedId != 0 && AppDb.Instance.Delete("Students", new { Id = _selectedId })) LoadStudents();
+}</code></pre>
+    <h3>Chart and report button</h3>
+<pre><code>private void btnReports_Click(object sender, EventArgs e)
+{
+    var data = AppDb.Instance.TableData("SELECT Program_Name, COUNT(*) AS StudentCount FROM Students GROUP BY Program_Name");
+    Charts.Bind(chart1, data, "Program_Name", "StudentCount", "Students");
+    ReportPrinter.Preview(AppDb.Instance.TableData("SELECT * FROM Students ORDER BY Id"), "Student List", "First Semester 2026–2027");
+}</code></pre>
+  </section>
+
+  <section class="card" id="more-examples">
+    <h2>Additional short implementations</h2>
+    <h3>Count, exists, and get one row</h3>
+<pre><code>int total = AppDb.Instance.Count("Students");
+bool exists = AppDb.Instance.Exists("Students", "Id_Number = '1001'");
+DataRow row = AppDb.Instance.GetById("Students", selectedId);
+if (row != null) txtFirstName.Text = Convert.ToString(row["First_Name"]);</code></pre>
+    <h3>Top rows and paging</h3>
+<pre><code>var latest = AppDb.Instance.GetTop("Students", 10, "Id DESC");
+var page = AppDb.Instance.Paginate("Students", pageNumber: 1, pageSize: 20, orderBy: "Id DESC");
+AppDb.Instance.Table(page, dataGridView1);</code></pre>
+    <h3>Scalar value and custom update</h3>
+<pre><code>var totalStudents = AppDb.Instance.Scalar("SELECT COUNT(*) FROM Students");
+AppDb.Instance.CUD(
+    "UPDATE Students SET Contact_Number = @contact WHERE Id = @id",
+    new { contact = txtContact.Text, id = selectedId });</code></pre>
+    <h3>Upsert and soft delete</h3>
+<pre><code>AppDb.Instance.Upsert("Students", "Id", new { Id = selectedId, First_Name = txtFirstName.Text, Last_Name = txtLastName.Text });
+AppDb.Instance.SoftDelete("Students", selectedId, "Id", "IsDeleted");
+AppDb.Instance.Restore("Students", selectedId, "Id", "IsDeleted");</code></pre>
+    <h3>Stored procedure and POCO list</h3>
+<pre><code>var rows = AppDb.Instance.QueryStoredProcedure("dbo.GetStudents", new { Program_Name = "BSIT" });
+var students = AppDb.Instance.QueryList&lt;StudentRow&gt;("SELECT * FROM Students WHERE Program_Name = @program", new { program = "BSIT" });</code></pre>
+  </section>
+
+  <section class="card" id="troubleshooting">
+    <h2>Step 6 — Troubleshooting</h2>
+    <ul>
+      <li><strong>Configuration error:</strong> confirm the connection string name is exactly <code>AppDB</code> and the database exists.</li>
+      <li><strong>Table or column not found:</strong> run <code>docs/schema.sql</code> and match the names used in your query.</li>
+      <li><strong>Chart is blank:</strong> verify the category and value column names; the value column must contain numeric data.</li>
+      <li><strong>No printer preview:</strong> install or select a Windows printer. Preview and printing are Windows desktop features.</li>
+      <li><strong>Third-party input is not cleared:</strong> its value should map to <code>Control.Text</code>; otherwise clear it directly with that control's own API.</li>
+    </ul>
+    <p>Open <code>Sample Project/OOP_Framework.sln</code> to see the CRUD form and the <strong>Charts and Reports</strong> demo.</p>
+  </section>
+</main>
+<footer>C# WinForms Classes • .NET Framework 4.7.2 • No external chart or report package required</footer>
+</body>
+</html>

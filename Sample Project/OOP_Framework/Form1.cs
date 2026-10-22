@@ -1,244 +1,146 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Windows.Forms;
-using red_framework; // This is Important 
+using red_framework;
 
 namespace OOP_Framework
 {
     public partial class Form1 : Form
     {
-
-        // selected id - use in Update & Delete - this value will change once you click/select on DataGridView/ListView Table UI
-        private int _selectedId = 0; 
+        private int _selectedId;
 
         public Form1()
         {
             InitializeComponent();
+            AddDemoButton();
         }
 
-        void clearInputs()
+        private void AddDemoButton()
         {
-            // Clear all Inputs
-            txtIDNumber.Clear();
-            txtFirstName.Clear();
-            txtMiddleName.Clear();
-            txtLastName.Clear();
-            txtContactNumber.Clear();
-            dtpBirthday.Value = DateTime.Now;
-            cbProgramName.SelectedIndex = 0;
-            _selectedId = 0; // reset selected id
-        }
-
-
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            var db = AppDb.Instance; // This is important, to be able to use the Databse Class and Methods
-
-            if (_selectedId == 0) // if no selected records, then SAVE
+            var button = new Button
             {
-                var ok = db.Save("Students", 
-                    new { 
-                        Id_Number = txtIDNumber.Text, 
-                        First_Name = txtFirstName.Text, 
-                        Middle_name = txtMiddleName.Text, 
-                        Last_Name = txtLastName.Text, 
-                        Contact_Number = txtContactNumber.Text, 
-                        Birthday = dtpBirthday.Value,
-                        Program_Name = cbProgramName.SelectedItem
-                    });
-                MessageBox.Show(ok ? "Successfully Saved." : "Insert failed.");
-
-                //or 
-                /* 
-                var res = db.CUD(
-                    "INSERT INTO Students (First_Name, Last_Name) VALUES (@First, @Last)",
-                    new { First_Name = txtFirstName.Text, Last_Name = txtLastName.Text }
-                );
-                MessageBox.Show(res > 0 ? "Successfully Saved." : "Insert failed.");
-                */
-            }
-            else // if have selected records, then UPDATE
-            {
-                var updateok = db.Update("Students", 
-                    new { 
-                        Id = _selectedId,
-                        Id_Number = txtIDNumber.Text,
-                        First_Name = txtFirstName.Text,
-                        Middle_name = txtMiddleName.Text,
-                        Last_Name = txtLastName.Text,
-                        Contact_Number = txtContactNumber.Text,
-                        Birthday = dtpBirthday.Value,
-                        Program_Name = cbProgramName.SelectedItem
-                    }
-                    //, "primaryKeyName" // if your primary key's name is not "Id"
-                );
-
-                MessageBox.Show(updateok ? "Successfully Updated." : "Update failed.");
-
-                // or
-                /*
-                var res = db.CUD(
-                    "UPDATE Students SET First_Name=@First WHERE Id=@Id",
-                    new { First_Name = txtFirstName.Text, Id = _selectedId }
-                );
-                MessageBox.Show(res > 0 ? "Successfully Saved." : "Insert failed.");
-                */
-            }
-
-            loadStudentRecords(); // METHOD to load all records to a DataGridView
-            clearInputs(); // METHOD to clear all fields
-
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Location = new System.Drawing.Point(780, 10),
+                Name = "btnChartReportDemo",
+                Size = new System.Drawing.Size(171, 30),
+                Text = "Charts and Reports"
+            };
+            button.Click += (sender, args) => { using (var demo = new ChartReportDemoForm()) demo.ShowDialog(this); };
+            Controls.Add(button);
+            button.BringToFront();
         }
 
-        void loadStudentRecords()
+        private object NewStudentData()
         {
-            var db = AppDb.Instance;
+            return new
+            {
+                Id_Number = txtIDNumber.Text,
+                First_Name = txtFirstName.Text,
+                Middle_name = txtMiddleName.Text,
+                Last_Name = txtLastName.Text,
+                Contact_Number = txtContactNumber.Text,
+                Birthday = dtpBirthday.Value,
+                Program_Name = cbProgramName.SelectedItem
+            };
+        }
 
-            // load all records to a DataGridView
-            db.Table(
+        private object UpdatedStudentData()
+        {
+            return new
+            {
+                Id = _selectedId,
+                Id_Number = txtIDNumber.Text,
+                First_Name = txtFirstName.Text,
+                Middle_name = txtMiddleName.Text,
+                Last_Name = txtLastName.Text,
+                Contact_Number = txtContactNumber.Text,
+                Birthday = dtpBirthday.Value,
+                Program_Name = cbProgramName.SelectedItem
+            };
+        }
+
+        private void ClearInputs()
+        {
+            FormControls.ClearInputs(groupBox1);
+            _selectedId = 0;
+        }
+
+        private void LoadStudentRecords()
+        {
+            AppDb.Instance.Table(
                 "SELECT Id, Id_Number, First_Name, Middle_name, Last_Name, Contact_Number, Birthday, Program_Name FROM Students ORDER BY Id DESC",
-                dgvStudent, // your DataGridView name
-                header: new[] {"Id", "ID Number", "First Name", "Middle Name", "Last Name", "Contact", "Birthday", "Program" } // This is the header displayed on DataGridView UI
-            );
+                dgvStudent,
+                header: new[] { "Id", "ID Number", "First Name", "Middle Name", "Last Name", "Contact", "Birthday", "Program" });
+            HideIdColumn();
+        }
 
-            dgvStudent.Columns["Id"].Visible = false; // hide primary key (the Id is belong to the Records but Hidden on UI)
-
+        private void HideIdColumn()
+        {
+            if (dgvStudent.Columns.Contains("Id")) dgvStudent.Columns["Id"].Visible = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            loadStudentRecords(); // load all records once the form is apeared/loaded
-
-            // Load Program in a ComboBox
-            var db = AppDb.Instance;
-            db.list(
-                    "SELECT Program_Name FROM Program", 
-                    cbProgramName // comboBox name
-                );
+            LoadStudentRecords();
+            AppDb.Instance.list("SELECT Program_Name FROM Program", cbProgramName);
         }
 
-        private void dgvStudent_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void btnSave_Click(object sender, EventArgs e)
         {
+            var missing = FormControls.FirstRequired(txtIDNumber, txtFirstName, txtLastName);
+            if (missing != null)
+            {
+                missing.Focus();
+                MessageBox.Show(missing.Name + " is required.");
+                return;
+            }
 
-            if (e.RowIndex < 0) return; //some validations
-
-            var drv = dgvStudent.Rows[e.RowIndex].DataBoundItem as DataRowView;
-            if (drv == null) return;
-
-            // assign Id (primary key) on a private property/variable - use in UPDATE and DELETE
-            // Note: the Id (primary key) is belongs to the records (DataGridView), but hidden on UI
-            _selectedId = (int)drv[0]; //index 0 is hidden (Id)
-
-            txtIDNumber.Text = drv[1]?.ToString() ?? "";            // first column show on DataGridView (ID Number) - index 1
-            txtFirstName.Text = drv[2]?.ToString() ?? "";           // First Name
-            txtMiddleName.Text = drv[3]?.ToString() ?? "";          // Middle name
-            txtLastName.Text = drv[4]?.ToString() ?? "";            // Last Name
-            txtContactNumber.Text = drv[5]?.ToString() ?? "";       // Contact Number
-            dtpBirthday.Value = Convert.ToDateTime(drv[6]);         // Birthday
-            cbProgramName.SelectedItem = drv[7]?.ToString() ?? "";  //Program Name
-
+            var ok = _selectedId == 0
+                ? AppDb.Instance.Save("Students", NewStudentData())
+                : AppDb.Instance.Update("Students", UpdatedStudentData());
+            MessageBox.Show(ok ? "Student saved." : "The record could not be saved.");
+            LoadStudentRecords();
+            ClearInputs();
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            //if accedentally clicked the delete button even no selected records (other approach: disable button if no selected)
-            if(_selectedId == 0) { MessageBox.Show("No record selected."); return; }
+            if (_selectedId == 0) { MessageBox.Show("Select a record first."); return; }
+            if (MessageBox.Show("Delete this student?", "Confirm delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
 
-            // Confirmation dialog
-            var confirmResult = MessageBox.Show(
-                "Are you sure you want to delete this record?",
-                "Confirm Delete",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question
-            );
-
-            if (confirmResult == DialogResult.Yes)
-            {
-                var db = AppDb.Instance;
-                var ok = db.Delete("Students", new { Id = _selectedId });
-                MessageBox.Show(ok ? "Successfully Deleted." : "Delete failed.");
-
-                // or
-                /*
-                var res = db.CUD(
-                    "DELETE FROM Students WHERE Id=@Id",
-                    new { Id = _selectedId }
-                );
-                MessageBox.Show(res > 0 ? "Successfully Saved." : "Insert failed.");
-                */
-
-                loadStudentRecords();
-                clearInputs();
-            }
+            var deleted = AppDb.Instance.Delete("Students", new { Id = _selectedId });
+            MessageBox.Show(deleted ? "Student deleted." : "The record could not be deleted.");
+            LoadStudentRecords();
+            ClearInputs();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            var db = AppDb.Instance;
+            var rows = AppDb.Instance.Search("Students", new[] { "First_Name", "Last_Name", "Id_Number" }, txtSearchInput.Text);
+            AppDb.Instance.Table(rows, dgvStudent,
+                header: new[] { "Id", "ID Number", "First Name", "Middle Name", "Last Name", "Contact", "Birthday", "Program" });
+            HideIdColumn();
+        }
 
-            // Search LIKE
-            var results = db.Search(
-                    "Students", // table
-                    new[] { "First_Name", "Last_Name", "Id_Number" }, // columns where you search the keys/records
-                    txtSearchInput.Text // search input box (text box)
-                );
+        private void dgvStudent_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            var row = dgvStudent.Rows[e.RowIndex].DataBoundItem as DataRowView;
+            if (row == null) return;
 
-            // Fill the results to your DataGridView
-            db.Table(
-                results, 
-                dgvStudent, 
-                header: new[] { "Id", "ID Number", "First Name", "Middle Name", "Last Name", "Contact", "Birthday", "Program" }
-            );
-
-            dgvStudent.Columns["Id"].Visible = false; // hide primary key
-
+            _selectedId = Convert.ToInt32(row[0]);
+            txtIDNumber.Text = row[1]?.ToString() ?? string.Empty;
+            txtFirstName.Text = row[2]?.ToString() ?? string.Empty;
+            txtMiddleName.Text = row[3]?.ToString() ?? string.Empty;
+            txtLastName.Text = row[4]?.ToString() ?? string.Empty;
+            txtContactNumber.Text = row[5]?.ToString() ?? string.Empty;
+            dtpBirthday.Value = Convert.ToDateTime(row[6]);
+            cbProgramName.SelectedItem = row[7]?.ToString();
         }
 
         private void btnClear_Click(object sender, EventArgs e)
         {
-            clearInputs(); // clear Inputs and Reset
+            ClearInputs();
         }
-
-
     }
 }
-
-/**
- * ======DATABASE===========
- * NOTE: 
- * Every table has a primary key (e.g. Id). Set it to "Auto Increment". (Properties: IsIdentity = Yes)
- * The column Id (primary key) is not belong/use inside the Insert Into statement becuase it will automatically create a value
- * The column Id (primary key) will use in Update and Delete statement
- * The column Id (primary key) is Hidden inside DataGridView/ListView/Table UI
- * Please see/study the flow and the source code of this sample project
- * 
- * ==Table Students==
- * 
-
-CREATE TABLE [dbo].[Students] (
-    [Id]             INT          IDENTITY (1, 1) NOT NULL,
-    [Id_Number]      VARCHAR (50) NOT NULL,
-    [First_Name]     VARCHAR (50) NOT NULL,
-    [Middle_Name]    VARCHAR (50) NULL,
-    [Last_Name]      VARCHAR (50) NOT NULL,
-    [Contact_Number] BIGINT       NOT NULL,
-    [BirthDay]       DATE         NOT NULL,
-    [Program_Name]   VARCHAR (50) NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
-
-
- * 
- * ==Table Program==
- * 
-
-CREATE TABLE [dbo].[Program] (
-    [Id]                  INT           IDENTITY (1, 1) NOT NULL,
-    [Program_Name]        VARCHAR (50)  NULL,
-    [Program_Description] VARCHAR (100) NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
-
- * 
- * 
- */

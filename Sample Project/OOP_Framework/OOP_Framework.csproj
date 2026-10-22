@@ -63,9 +63,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\AppDb.cs" />
-    <Compile Include="Classes\IDatabase.cs" />
-    <Compile Include="Classes\SqlDatabase.cs" />
+    <Compile Include="..\..\Classes\AppDb.cs"><Link>Classes\AppDb.cs</Link></Compile>
+    <Compile Include="..\..\Classes\IDatabase.cs"><Link>Classes\IDatabase.cs</Link></Compile>
+    <Compile Include="..\..\Classes\SqlDatabase.cs"><Link>Classes\SqlDatabase.cs</Link></Compile>
+    <Compile Include="..\..\Classes\FormControls.cs"><Link>Classes\FormControls.cs</Link></Compile>
+    <Compile Include="..\..\Classes\Charts.cs"><Link>Classes\Charts.cs</Link></Compile>
+    <Compile Include="..\..\Classes\ReportPrinter.cs"><Link>Classes\ReportPrinter.cs</Link></Compile>
+    <Compile Include="ChartReportDemoForm.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,15 +102,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="MyDB.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="MyDB_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>MyDB.mdf</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
